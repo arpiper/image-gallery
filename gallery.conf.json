@@ -1,0 +1,8 @@
+{
+  "data": {
+    "__commment": "type should be 'local' or 'url'",
+    "type": "url",
+    "source": "https://arpiper.com/images/api",
+    "key": ""
+  }
+}
