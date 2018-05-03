@@ -12,19 +12,22 @@
           v-on:enter="enter">
           <images-single 
             v-for="(img,index) in displayed_images" 
-            v-bind:key="img[0].id"
-            v-bind:image="img[0]"
-            v-bind:idx="img[2].key"
-            v-bind:data-index="index"
-            v-bind:row_used="row_used"
-            v-bind:position="img[2]"
-            v-bind:min_height="min_height"
+            :key="img[0].id"
+            :image="img[0]"
+            :idx="img[2].key"
+            :data-index="index"
+            :row_used="row_used"
+            :position="img[2]"
+            :min_height="min_height"
             ref="image">
           </images-single>
         </transition-group>
       </div>
       <div v-else class="images">
         <p>There are no images to show</p>
+      </div>
+      <div class="images2">
+        <images-single2 v-for="(img,i) of displayed_images" :image="img[0]" :key="i"></images-single2>
       </div>
     </div>
     <transition name="fade">
@@ -37,6 +40,7 @@
 
 <script>
 import ImagesSingle from "./ImagesSingle.vue"
+import ImagesSingle2 from "./ImagesSingle2.vue"
 
 export default {
   name: "images-block",
@@ -55,7 +59,7 @@ export default {
         bottom: 50,
         top: 50
       },
-      min_height: 275,
+      min_height: 325,
       row_used: 0,
       row: 0,
       images: [],
@@ -95,7 +99,7 @@ export default {
     loadImages () {
       let imgs = this.images
       imgs.forEach((v, i) => {
-        if (vm.checkViewable(v[2].position)) {
+        if (this.checkViewable(v[2].position)) {
           this.displayed_images.push(v)
           if (v[2].position.left === 0) {
             this.block_bottom += v[2].adj_height
@@ -127,17 +131,16 @@ export default {
     },
     scaleRowUp (w) {
       let space = this.width - w
-      let vm = this
       let new_height = this.min_height
       let new_left = 0 
       this.current_row.forEach((v) => {
-        let p = v.adj_width / vm.width
+        let p = v.adj_width / this.width
         v.adj_width += Math.floor(p * space)
         v.adj_height = Math.floor(v.adj_width / v.ratio)
-        new_height = (vm.min_height > v.adj_height) ? vm.min_height : v.adj_height
+        new_height = (this.min_height > v.adj_height) ? this.min_height : v.adj_height
         v.position.left = new_left
         new_left += v.adj_width
-        vm.displayed_images[v.key][2] = v
+        this.displayed_images[v.key][2] = v
       })
       return new_height
     },
@@ -242,7 +245,8 @@ export default {
   watch: {
   },
   components: {
-    ImagesSingle
+    ImagesSingle,
+    ImagesSingle2,
   },
   created () {
     this.evtHub.$on("get-next-image", this.sendImage)
@@ -261,6 +265,14 @@ export default {
 </script>
 
 <style scoped>
+.images2 {
+  display: grid;
+  grid-auto-rows: 300px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, auto));
+  grid-auto-flow: dense;
+  grid-gap: 10px;
+  width: 100%;
+}
 .images-block-root {
   width: 100%;
   height: 100%;

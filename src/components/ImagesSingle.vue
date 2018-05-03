@@ -6,7 +6,6 @@
 </template>
 
 <script>
-// import eventHub from "../EventHub.js"
 
 export default {
   name: "images-single",
@@ -95,27 +94,32 @@ div {
   position: absolute;
   display: inline-block;
   text-align: center;
+  transition: transform 0.25s;
+  padding: 10px;
 }
-
 img {
   height: 100%;
   min-width: 100%;
   display: inline-block;
-  padding: 2px;
+  cursor: pointer;
 }
-
+div:hover {
+  transform: scale(1.15);
+  z-index: 10;
+}
+img:hover {
+  box-shadow: 0 0 5px 0 black;
+}
 span {
   display: flex;
   width: 100%;
   height: 100%;
   background-color: #eee;
 }
-
 .last img {
   min-width: 0;
   width: auto;
 }
-
 .loader {
   border: 5px solid #f3f3f3;
   border-top: 5px solid #4caf50;
@@ -124,7 +128,6 @@ span {
   height: 50px;
   animation: spin 2s linear infinite;
 }
-
 @keyframes spin {
   0% {
     transform: rotate(0deg);

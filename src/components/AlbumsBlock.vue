@@ -1,13 +1,13 @@
 <template>
   <div class="album-block">
-    <div class="message">
-      <span>{{ message }}</span>
-    </div>
-    <div v-for="album in albums" v-if="album.img" class="album-link" >
-      <div v-on:click="selectAlbum(album)">
+    <div v-for="album in albums" v-if="album.img" class="albums" >
+      <div v-on:click="selectAlbum(album)" class="album">
         <h4>{{ album.name }}</h4>
-        <img :src="album.img.url" :alt="album.img.name">
+        <img :src="album.img.url" :alt="album.img.name" class="album-img">
       </div>
+    </div>
+    <div class="message" v-else-if="statuscode !== 200">
+      <span>{{ message }}</span>
     </div>
   </div>
 </template>
@@ -24,6 +24,7 @@ export default {
     return {
       albums: undefined,
       message: undefined,
+      statuscode: undefined,
     }
   },
   computed: {
@@ -40,7 +41,7 @@ export default {
         })
         .then((res) => {
           this.message = res.status.message
-          console.log(res)
+          this.message = res.status.code
           if (res.status.code === 200) {
             this.albums = res.albums
           }
@@ -48,9 +49,7 @@ export default {
     },
   },
   created () {
-    //let vm = this
     this.getAlbums()
-    console.log(this.albums)
   },
   mounted () {
   },
@@ -64,9 +63,9 @@ div.album-block {
   justify-content: space-between;
   max-width: 1000px;
   margin: 0 auto;
-  padding-top: 50px;
+  padding: 50px 0;
 }
-.album-link {
+.albums {
   display: flex;
   flex: auto;
   align-items: center;
@@ -74,16 +73,22 @@ div.album-block {
   margin: 2px;
   overflow: hidden;
   justify-content: center;
-  cursor: pointer;
 }
-.album-link a {
+.albums a {
   text-decoration: none;
   color: var(--color-dark);
+}
+.album {
+  padding: 10px;
+  cursor: pointer;
 }
 img {
   display: flex;
   height: 100%;
   min-width: 100%;
+}
+.album:hover img {
+  box-shadow: 0 0 10px 0 black;
 }
 span {
   display: inline-block;
