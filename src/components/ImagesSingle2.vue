@@ -35,18 +35,20 @@ export default {
       }
     },
     imageSpan () {
-      let pw = this.$paretn.width
-      if (this.image.width / pw >= 0.75) {
+      let pw = this.$parent.width
+      console.log('im w', this.image.width, 'pw', pw)
+      this.gridClass = `grid-span-${Math.floor(this.image.ratio)}`
+      /*if (this.image.width / pw >= 0.75) {
         this.gridClass = 'grid-span-3'
       } else if (this.image.width / pw >= 0.4 && this.image.width / pw <= 0.6) {
         this.gridClass = 'grid-span-2'
-      }
+      }*/
     },
     viewFullSize (evt) {
     },
   },
   created () {
-    console.log(this)
+    console.log(this.image)
     this.imageRatio()
     this.imageSpan()
   }
@@ -69,11 +71,20 @@ export default {
   height: auto;
   width: 100%;
 }
+.grid-span-1 {
+  grid-column-end: span 1;
+}
 .grid-span-2 {
-  grid-column-span: span 2;
+  grid-column-end: span 2;
 }
 .grid-span-3 {
-  grid-column-span: span 3;
+  grid-column-end: span 3;
+}
+.grid-span-4 {
+  grid-column-end: span 4;
+}
+.grid-span-5 {
+  grid-column-end: span 5;
 }
 .image-container:hover {
   transform: scale(1.25);

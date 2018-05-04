@@ -1,19 +1,23 @@
 <template>
-  <div class="image" v-bind:style="style_object" >
+  <div class="image-container" v-bind:style="style_object" >
     <span v-if="!src" class="loader" :width="width" :height="height"></span>
-    <img v-else v-bind:data-src="src" :src="src" v-on:click="viewFullSize($event)">
+    <div v-else class="highlight">
+      <img 
+        v-bind:data-src="src" 
+        :src="src" 
+        @:click="viewFullSize($event)" 
+        :class="orientation">
+    </div>
   </div>
 </template>
 
 <script>
-
 export default {
   name: "images-single",
   props: {
     image: Object,
     min_height: Number,
     row_used: Number,
-    // src: String,
     idx: Number,
     position: Object,
   },
@@ -28,45 +32,52 @@ export default {
     }
   },
   computed: {
-    adj_height: function () {
+    adj_height () {
       if (this.min_height > this.position.adj_height) {
         return this.min_height
       }
       return this.position.adj_height
     },
     adj_width: {
-      get: function () {
+      get () {
         return this.position.adj_width
       },
-      set: function (w) {
+      set (w) {
         this.width = w
         this.height = this.min_height
       }
     },
-    style_object: function () {
+    style_object () {
       let obj = {
         height: `${this.adj_height}px`,
         width: `${this.adj_width}px`,
         top: `${this.position.position.top}px`,
         left: `${this.position.position.left}px`,
       }
-      return obj         
+      return obj
+    },
+    orientation () {
+      console.log(this)
+      if (this.image.ratio < 1) {
+        return 'portrait'
+      }
+      return 'landscape'
     },
   },
   methods: {
-    loadImage: function () {
+    loadImage () {
       // load the image if the position is within the viewable window.
     },
-    getPosition: function () {
+    getPosition () {
       return {
         top: this.$el.offsetTop,
         left: this.$el.offsetLeft
       }
     },
-    viewFullSize: function (evt) {
+    viewFullSize (evt) {
       this.evtHub.$emit("view-full-size", this.image, this.idx)
     },
-    adjustImage: function (e) {
+    adjustImage (e) {
     }
   },
   beforeCreate () {
@@ -75,7 +86,7 @@ export default {
   },
   mounted () {
     this.src = this.url
-    this.evtHub.$emit("images-loaded")
+    this.evtHub.$emit("image-loaded")
   },
   destroyed () {
     this.evtHub.$off("image-added")
@@ -84,31 +95,34 @@ export default {
 </script>
 
 <style scoped>
-div {
-  /*display: flex;
-  flex: auto;
-  justify-content: center;
-  align-items: center;
-  margin: 2px;*/
+.image-container {
   overflow: hidden;
   position: absolute;
   display: inline-block;
   text-align: center;
+  padding: 5px;
   transition: transform 0.25s;
-  padding: 10px;
 }
 img {
-  height: 100%;
-  min-width: 100%;
   display: inline-block;
   cursor: pointer;
 }
-div:hover {
-  transform: scale(1.15);
-  z-index: 10;
+img.portrait {
+  height: 100%;
+  max-width: 100%;
 }
-img:hover {
-  box-shadow: 0 0 5px 0 black;
+img.landscape {
+  height: 100%;
+  min-width: 100%;
+}
+.highlight{
+  background-color: white;
+  height: 100%;
+  width: 100%;
+  box-shadow: 0 0 3px -2px black;
+}
+.highlight img:hover {
+  opacity: 0.6;
 }
 span {
   display: flex;
