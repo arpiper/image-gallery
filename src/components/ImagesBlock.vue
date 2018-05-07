@@ -66,6 +66,7 @@ export default {
       displayed_images: [],
       scroll_position: window.innerHeight + window.scrollY,
       block_bottom: 0,
+      block_height: 0,
       current_row: [],
       loading: true,
     }
@@ -81,69 +82,68 @@ export default {
     displayImages (imgs) {
       imgs.forEach((v,i) => {
         let s = this.getAdjustedSize(v)
-        //console.log('beofore', s.adj_width)
         s.position = this.getPosition(s)
         s.key = i
         this.current_row.push(s)
-        //console.log('after', s.position, s.adj_width) 
         // check whether image is in the viewable area
-        //console.log(this.current_row)
         if (this.checkViewable(s.position)) {
           this.displayed_images.push([v, new Date(v.upload_date), s])
           this.placeholder.splice(i, 1)
           this.evtHub.$emit("image-added", Date.now())
           if (s.key === imgs.length - 1) {
+            // set proper height when no scrolling needed.
             this.block_bottom += s.adj_height
           }          
+          if (s.position.left === 0) {
+            this.block_height += s.adj_height
+          }
         } else {
           this.images.push([v, new Date(v.upload_date), s])
         }
       })
     },
+    // load more images as they scroll into view.
     loadImages () {
       let imgs = this.images
       imgs.forEach((v, i) => {
         if (this.checkViewable(v[2].position)) {
           this.displayed_images.push(v)
-          //console.log(v[2].position, v[2].adj_width)
           if (v[2].position.left === 0) {
-            this.block_bottom += v[2].adj_height
+            this.block_height += v[2].adj_height
           }
           this.images.splice(i, 1)
         }
       })
     },
     checkViewable (position) {
-      return position.top < (window.innerHeight + window.scrollY)
+      return position.top <= (window.innerHeight + window.scrollY)
     },
     getPosition (s) {
+      let top = this.block_bottom
       let left = this.current_row.reduce((sum, v) => {
         return sum + v.adj_width
       }, 0)
-      //console.log(s.adj_width, this.width, left, this.block_bottom)
       // can more than half the image fit in space remaining?
       if ((this.width - left) / s.adj_width > 0.5 && (this.width - left) / s.adj_width < 1) {
         // end of row, scale down the current row
         s.adj_width = this.width - left
-        //console.log('if one', s.adj_width)
       } else if (this.width - left < s.adj_width) {
         // further check for full width image
         if (this.width < s.adj_width) {
           s.adj_width = this.width
         }
-        //console.log('else if', s.adj_width, left)
         // image wont fit nicely in space remaining -> end of row reached,
-        //scale up current row and start new row with this image.
+        // scale up current row and start new row with this image.
         let h = this.scaleRowUp(left)
         left = 0
         this.row++
         this.current_row = []
         this.block_bottom += h
+        top += h
       }
-      return {top: this.block_bottom, left: left}
+      return {top: top, left: left}
     },
     scaleRowUp (w) {
-      console.log('scale', this.current_row)
       let space_remaining = this.width - w
       let new_height = this.min_height
       let new_left = 0 
@@ -154,8 +154,6 @@ export default {
         new_height = (this.min_height > v.adj_height) ? this.min_height : v.adj_height
         v.position.left = new_left
         new_left += v.adj_width
-        //console.log(this.displayed_images[v.key], v.key, v)
-        //this.displayed_images[v.key][2] = v
         this.current_row[i][2] = v
       })
       return new_height
@@ -245,7 +243,7 @@ export default {
     },
     container_style () {
       return {
-        height: `${this.block_bottom}px`,
+        height: `${this.block_height}px`,
         width: "100%"
       }
     },
@@ -272,8 +270,6 @@ export default {
     window.addEventListener("scroll", this.checkScrollPosition)
     let imageData = fetch(this.images_source).then(res => res.json())
     this.setImages(imageData)
-    console.log('dis', this.displayed_images)
-    console.log('imgs', this.images)
   },
   destroyed () {
     this.evtHub.$off("get-next-image")
@@ -335,7 +331,7 @@ export default {
   border-radius: 50%;
   width: 50px;
   height: 50px;
-  animation: spin 2s ease-in-out infinite;
+  animation: spin 1s ease-in-out infinite;
 }
 .loader-container {
   width: 100%;

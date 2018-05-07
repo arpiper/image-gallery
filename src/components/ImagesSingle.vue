@@ -5,7 +5,7 @@
       <img 
         v-bind:data-src="src" 
         :src="src" 
-        @:click="viewFullSize($event)" 
+        @click="viewFullSize($event)" 
         :class="orientation">
     </div>
   </div>
@@ -57,7 +57,6 @@ export default {
       return obj
     },
     orientation () {
-      console.log(this)
       if (this.image.ratio < 1) {
         return 'portrait'
       }
@@ -140,7 +139,7 @@ span {
   border-radius: 50%;
   width: 50px;
   height: 50px;
-  animation: spin 2s linear infinite;
+  animation: spin 1s linear infinite;
 }
 @keyframes spin {
   0% {
