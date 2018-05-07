@@ -2,11 +2,11 @@
   <transition name="fade">
     <div v-if="active" class="modal-container">
       <div class="modal-content">
-        <div class="modal-body" v-on:click="closeImage($event)">
-          <img v-bind:src="src" v-on:click.stop="nextImage()">
+        <div class="modal-body" @click="closeImage($event)">
+          <img :src="src" @click.stop="nextImage()">
         </div>
       </div>
-      <div class="modal-close" v-on:click="closeImage($event)">
+      <div class="modal-close" @click="closeImage($event)">
         <span>x</span>
       </div>
     </div>
@@ -83,6 +83,7 @@ export default {
 .modal-body img {
   max-height: 100%;
   max-width: 100%;
+  cursor: pointer;
 }
 .modal-close {
   font-size: 30pt;
@@ -96,7 +97,7 @@ export default {
   right: 0;
 }
 .fade-enter-active, .fade-leave-active {
-  transition: opacity .5s;
+  transition: opacity .25s;
 }
 .fade-enter, .fade-leave-to {
   opacity: 0;
