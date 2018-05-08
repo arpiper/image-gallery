@@ -9,10 +9,18 @@
     <div class="message" v-else-if="statuscode !== 200">
       <span>{{ message }}</span>
     </div>
+    <div v-for="album of albums" class="albums">
+      <router-link :to="{name: 'one_album', params: { name: album.clean_name }}">
+        <h4>{{ album.name }}</h4>
+        <img :src="album.img.url" :alt="album.img.name" class="album-img">
+      </router-link>
+    </div>
   </div>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
   name: "albums-block",
   props: {
@@ -28,14 +36,16 @@ export default {
     }
   },
   computed: {
+    ...mapGetters([
+      "albumsURL",
+    ]),
   },
   methods: {
     selectAlbum (album) {
       this.evtHub.$emit("selectAlbum", album)
     },
     getAlbums () {
-      let url = `${this.album_source}/albums/all/1`
-      fetch(url)
+      fetch(this.albumsURL)
         .then((res) => {
           return res.json()
         })

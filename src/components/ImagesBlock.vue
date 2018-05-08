@@ -26,9 +26,6 @@
       <div v-else class="images">
         <p>There are no images to show</p>
       </div>
-      <!--div class="images2">
-        <images-single2 v-for="(img,i) of displayed_images" :image="img[0]" :key="i"></images-single2>
-      </div-->
     </div>
     <transition name="fade">
       <div v-show="loading" class="loader-container">
@@ -40,7 +37,7 @@
 
 <script>
 import ImagesSingle from "./ImagesSingle.vue"
-import ImagesSingle2 from "./ImagesSingle2.vue"
+import { mapGetters } from "vuex"
 
 export default {
   name: "images-block",
@@ -211,6 +208,9 @@ export default {
     },
   },
   computed: {
+    source () {
+      return `${this.imagesURL}${this.$route.params.name}`
+    },
     item_width () {
       return this.width / this.grid_width
     },
@@ -255,20 +255,26 @@ export default {
         marginBottom: `${this.margin.bottom}px` 
       }
     },
+    ...mapGetters([
+      'imagesURL',
+    ])
   },
   watch: {
   },
   components: {
     ImagesSingle,
-    ImagesSingle2,
   },
   created () {
+    console.log(this.$route.params.name)
     this.evtHub.$on("get-next-image", this.sendImage)
     this.evtHub.$on("image-loaded", this.imageLoaded)
   },
   mounted () {
     window.addEventListener("scroll", this.checkScrollPosition)
     let imageData = fetch(this.images_source).then(res => res.json())
+    if (this.source) {
+      let imageData = fetch(this.source).then(res => res.json())
+    }
     this.setImages(imageData)
   },
   destroyed () {
@@ -279,14 +285,6 @@ export default {
 </script>
 
 <style scoped>
-.images2 {
-  display: grid;
-  grid-auto-rows: 300px;
-  grid-template-columns: repeat(auto-fit, minmax(200px, auto));
-  grid-auto-flow: dense;
-  grid-gap: 10px;
-  width: 100%;
-}
 .images-block-root {
   width: 100%;
   height: 100%;

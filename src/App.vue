@@ -3,7 +3,7 @@
     <albums-block
       v-if="!album_selected"
       v-bind:album_list="albums"
-      v-bind:album_source="album_uri">
+      :album_source="api">
     </albums-block>
     <images-block 
       v-else-if="album_selected"
@@ -15,6 +15,7 @@
     </images-block>
     <modal-block>
     </modal-block>
+    <router-view></router-view>
   </div>
 </template>
 
@@ -22,7 +23,7 @@
 import AlbumsBlock from "./components/AlbumsBlock.vue"
 import ImagesBlock from "./components/ImagesBlock.vue"
 import ModalBlock from "./components/ModalBlock.vue"
-import config from "../gallery.conf.json"
+import { mapState } from "vuex"
 
 export default {
   name: "app",
@@ -30,8 +31,8 @@ export default {
     return {
       // number of images to show in a row
       grid_width: 3,
-      type: config.data.type,
-      album_uri: config.data.source,
+      type: 'url',
+      //album_uri: config.data.source,
       album_selected: false,
       album_title: "",
       albums: "",
@@ -53,7 +54,10 @@ export default {
         return this.album_uri
       }
       return albumData
-    }
+    },
+    ...mapState([
+      'api',
+    ]),
   },
   methods: {
     openAlbum (album) {
