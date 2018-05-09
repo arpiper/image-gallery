@@ -1,6 +1,6 @@
 <template>
   <div class="album-block">
-    <div v-for="album in albums" v-if="album.img" class="albums" >
+    <!--div v-for="album in albums" v-if="album.img" class="albums" >
       <div v-on:click="selectAlbum(album)" class="album">
         <h4>{{ album.name }}</h4>
         <img :src="album.img.url" :alt="album.img.name" class="album-img">
@@ -8,7 +8,7 @@
     </div>
     <div class="message" v-else-if="statuscode !== 200">
       <span>{{ message }}</span>
-    </div>
+    </div-->
     <div v-for="album of albums" class="albums">
       <router-link :to="{name: 'one_album', params: { name: album.clean_name }}">
         <h4>{{ album.name }}</h4>

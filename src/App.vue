@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <albums-block
+    <!--albums-block
       v-if="!album_selected"
       v-bind:album_list="albums"
       :album_source="api">
@@ -12,10 +12,10 @@
       v-bind:images_source_type="type" 
       v-bind:grid_width="grid_width"
       v-bind:image_count="count">
-    </images-block>
+    </images-block-->
+    <router-view></router-view>
     <modal-block>
     </modal-block>
-    <router-view></router-view>
   </div>
 </template>
 
