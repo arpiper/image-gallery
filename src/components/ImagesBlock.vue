@@ -76,6 +76,7 @@ export default {
     },
     // sort the images by the upload date and place into relavent array displayed/images
     displayImages (imgs) {
+      console.log('width?', document.body.offsetWidth, window.innerWidth)
       imgs.forEach((v,i) => {
         let image_size = this.getAdjustedSize(v)
         image_size.position = this.getPosition(image_size)
@@ -84,8 +85,7 @@ export default {
         // check whether image is in the viewable area
         if (this.checkViewable(image_size.position)) {
           this.displayed_images.push([v, new Date(v.upload_date), image_size])
-          //this.placeholder.splice(i, 1)
-          this.evtHub.$emit("image-added", Date.now())
+          //this.evtHub.$emit("image-added", Date.now())
           if (image_size.key === imgs.length - 1) {
             // set proper height when no scrolling needed.
             this.block_bottom += image_size.adj_height
@@ -116,9 +116,6 @@ export default {
     },
     getPosition (s) {
       let top = this.block_bottom
-      /*let left = this.current_row.reduce((sum, v) => {
-        return sum + v.adj_width
-      }, 0)*/
       let left = this.rowSpaceUsed()
       // can more than half the image fit in space remaining?
       if ((this.width - left) / s.adj_width > 0.5 && (this.width - left) / s.adj_width < 1) {
@@ -126,28 +123,23 @@ export default {
         let down = this.scaleRowDown(s, left + s.adj_width)
         s.adj_width = this.width - down.l
         s.adj_height = down.h
-        console.log('s',s)
-        //this.block_bottom += down.h
+        this.block_bottom += down.h
         left = down.l
       } else if (this.width - left < s.adj_width) {
+        let h = this.init_height
         // further check for full width image
         if (this.width < s.adj_width) {
           s.adj_width = this.width
+        } else if (this.width > left) {
+          h = this.scaleRowUp(left)
+          top += h
         }
-        // image wont fit nicely in space remaining -> end of row reached,
-        // scale up current row and start new row with this image.
-        let h = this.init_height
-        if (this.width - left !== 0) {
-          h = this.scaleRowUp(this.width - left)
-        }
-        console.log('else s', s)
+        console.log(s, 'ehlo')
         left = 0
         this.row++
         this.current_row = []
         this.block_bottom += h
-        top += h
       }
-      console.log({top: top, left: left})
       return {top: top, left: left}
     },
     // the two scale funcs are functionally the same. to do : merge them.
@@ -165,11 +157,11 @@ export default {
     },
     scaleRowUp (row_width) {
       let new_height = Math.floor(this.width / (row_width / this.init_height)) //this.init_height
-      console.log('up', row_width, new_height)
+      //console.log('up', row_width, new_height)
       let new_left = 0 
       this.current_row.forEach((v,i) => {
         let percentage_used = v.adj_width / this.width
-        v.adj_width += Math.floor(percentage_used * row_width)
+        v.adj_width = Math.floor(v.ratio * new_height) //Math.floor(percentage_used * row_width)
         v.adj_height = new_height //Math.floor(v.adj_width / v.ratio)
         //new_height = (this.init_height > v.adj_height) ? this.init_height : v.adj_height
         v.position.left = new_left

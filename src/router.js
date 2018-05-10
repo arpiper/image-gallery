@@ -1,4 +1,5 @@
 import App from './App.vue'
+import Home from './components/Home.vue'
 import AlbumsBlock from './components/AlbumsBlock.vue'
 import ImagesBlock from './components/ImagesBlock.vue'
 
@@ -6,7 +7,7 @@ const routes = [
   {
     name: 'home',
     path: '/',
-    component: App,
+    component: Home,
     children: [
       {
         name: 'all_albums',
