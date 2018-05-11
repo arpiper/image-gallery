@@ -1,13 +1,18 @@
 <template>
   <div class="image-container" v-bind:style="style_object" >
-    <span v-if="!src" class="loader" :width="width" :height="height"></span>
-    <div v-else class="highlight">
-      <img 
-        v-bind:data-src="src" 
-        :src="src" 
-        @click="viewFullSize($event)" 
-        :class="orientation">
-    </div>
+    <transition
+      name="fadein"
+      @beforeEnter="beforeEnter"
+      @enter="enter">
+      <div class="highlight">
+        <img 
+          :data-id="idx"
+          :data-src="src" 
+          :src="src" 
+          @click="viewFullSize($event)" 
+          :class="orientation">
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -64,9 +69,6 @@ export default {
     },
   },
   methods: {
-    loadImage () {
-      // load the image if the position is within the viewable window.
-    },
     getPosition () {
       return {
         top: this.$el.offsetTop,
@@ -76,8 +78,15 @@ export default {
     viewFullSize (evt) {
       this.evtHub.$emit("view-full-size", this.image, this.idx)
     },
-    adjustImage (e) {
-    }
+    beforeEnter (el) {
+      el.style.opacity = 0
+    },
+    enter (el, done) {
+      let d = el.dataset.index * 100
+      setTimeout(() => {
+        el.style.opacity = 1
+      }, d)
+    },
   },
   beforeCreate () {
   },
@@ -88,7 +97,7 @@ export default {
     this.evtHub.$emit("image-loaded")
   },
   destroyed () {
-    this.evtHub.$off("image-added")
+    //this.evtHub.$off("image-added")
   }
 }
 </script>
@@ -114,11 +123,10 @@ img.landscape {
   height: 100%;
   min-width: 100%;
 }
-.highlight{
+.highlight {
   background-color: white;
   height: 100%;
   width: 100%;
-  box-shadow: 0 0 3px -2px black;
 }
 .highlight img:hover {
   opacity: 0.6;
