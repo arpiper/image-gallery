@@ -6,22 +6,17 @@
         <span @click="goBack" class="vue-button">Back</span>
       </div>
       <div class="images" v-bind:style="container_style" ref="images">
-        <transition-group
-          name="images"
-          v-on:beforeEnter="beforeEnter"
-          v-on:enter="enter">
-          <images-single 
-            v-for="(img,index) in displayed_images" 
-            :key="img[0].id"
-            :image="img[0]"
-            :idx="img[2].key"
-            :data-index="index"
-            :row_used="row_used"
-            :position="img[2]"
-            :init_height="init_height"
-            ref="image">
-          </images-single>
-        </transition-group>
+        <images-single 
+          v-for="(img,index) in displayed_images" 
+          :key="img[0].id"
+          :idx="img[2].key"
+          :data-index="index"
+          :image="img[0]"
+          :row_used="row_used"
+          :position="img[2]"
+          :init_height="init_height"
+          ref="image">
+        </images-single>
       </div>
     </div>
     <transition name="fade">
@@ -40,9 +35,6 @@ export default {
   name: "images-block",
   props: {
     grid_width: Number,
-    images_source_type: String,
-    images_source: [String, Array],
-    title: String,
     image_count: [Number, String],
   },
   data () {
@@ -63,6 +55,7 @@ export default {
       block_height: 0,
       current_row: [],
       loading: true,
+      title: this.$route.params.name,
     }
   },
   methods: {
@@ -76,10 +69,9 @@ export default {
     },
     // sort the images by the upload date and place into relavent array displayed/images
     displayImages (imgs) {
-      console.log('width?', document.body.offsetWidth, window.innerWidth)
       imgs.forEach((v,i) => {
         let image_size = this.getAdjustedSize(v)
-        image_size.position = this.getPosition(image_size)
+        image_size.position = this.getPosition(image_size, v)
         image_size.key = i
         this.current_row.push(image_size)
         // check whether image is in the viewable area
@@ -100,8 +92,7 @@ export default {
     },
     // load more images as they scroll into view.
     loadImages () {
-      let imgs = this.images
-      imgs.forEach((v, i) => {
+      this.images.forEach((v, i) => {
         if (this.checkViewable(v[2].position)) {
           this.displayed_images.push(v)
           if (v[2].position.left === 0) {
@@ -114,36 +105,38 @@ export default {
     checkViewable (position) {
       return position.top <= (window.innerHeight + window.scrollY)
     },
-    getPosition (s) {
+    getPosition (s, img) {
       let top = this.block_bottom
       let left = this.rowSpaceUsed()
       // can more than half the image fit in space remaining?
       if ((this.width - left) / s.adj_width > 0.5 && (this.width - left) / s.adj_width < 1) {
         // end of row, scale down the current row
-        let down = this.scaleRowDown(s, left + s.adj_width)
+        let down = this.scaleRow(left + s.adj_width)
         s.adj_width = this.width - down.l
         s.adj_height = down.h
         this.block_bottom += down.h
         left = down.l
+      // is more than half the row remaining, and will be filled?
+      } else if (this.width / 2 > left && this.width - left < s.adj_width) {
+        s.adj_width = this.width - left
+        this.block_bottom += this.init_height
       } else if (this.width - left < s.adj_width) {
-        let h = this.init_height
-        // further check for full width image
-        if (this.width < s.adj_width) {
+        if (this.width < s.adj_width) { // further check for full width image
           s.adj_width = this.width
+          this.block_bottom += this.init_height
         } else if (this.width > left) {
-          h = this.scaleRowUp(left)
-          top += h
+          let up = this.scaleRow(left)
+          top += up.h
+          this.block_bottom += up.h
         }
-        console.log(s, 'ehlo')
         left = 0
         this.row++
         this.current_row = []
-        this.block_bottom += h
       }
       return {top: top, left: left}
     },
-    // the two scale funcs are functionally the same. to do : merge them.
-    scaleRowDown (s, row_width) {
+    // scale the current row up/down in height when next image wont fit.
+    scaleRow (row_width) {
       let new_height = Math.floor(this.width / (row_width / this.init_height))
       let new_left = 0
       this.current_row.forEach((v,i) => {
@@ -153,22 +146,8 @@ export default {
         new_left += v.adj_width
         this.current_row[i] = v
       })
+      this.block_height += new_height - this.init_height
       return {h: new_height, l: new_left}
-    },
-    scaleRowUp (row_width) {
-      let new_height = Math.floor(this.width / (row_width / this.init_height)) //this.init_height
-      //console.log('up', row_width, new_height)
-      let new_left = 0 
-      this.current_row.forEach((v,i) => {
-        let percentage_used = v.adj_width / this.width
-        v.adj_width = Math.floor(v.ratio * new_height) //Math.floor(percentage_used * row_width)
-        v.adj_height = new_height //Math.floor(v.adj_width / v.ratio)
-        //new_height = (this.init_height > v.adj_height) ? this.init_height : v.adj_height
-        v.position.left = new_left
-        new_left += v.adj_width
-        this.current_row[i] = v
-      })
-      return new_height
     },
     // calculate remaining space in the current row
     rowSpaceUsed () {
@@ -206,6 +185,7 @@ export default {
       }
       this.evtHub.$emit("view-full-size", nextImg[0], imgIdx)
     },
+    // transition functions
     beforeEnter (el) {
       el.style.opacity = 0
     },
@@ -220,12 +200,14 @@ export default {
     },
     // browse back to the album list page
     goBack () {
-      //this.evtHub.$emit("back-to-albums")
       this.$router.go(-1)
     },
   },
   computed: {
     source () {
+      if (this.$route.params.name === 'all') {
+        return `${this.imagesAllURL}`
+      }
       return `${this.imagesURL}${this.$route.params.name}`
     },
     item_width () {
@@ -237,27 +219,6 @@ export default {
     height () {
       return this.width * (4 / 3)
     },
-    /*placeholder () {
-      let count = parseInt(this.image_count)
-      let p = []
-      let w = this.width / 5
-      let counter = 0
-      for (let i = 0; i < count; i++) {
-        if (i % 5 === 0 && i > 0) {
-          counter++
-        }
-        let t = {
-          style: {
-            top: `${this.init_height * Math.floor(i / 5)}px`,
-            left: `${w * (i - 5 * counter)}px`,
-            width: `${w}px`,
-            height: `${this.init_height}px`,
-          }
-        }
-        p.push(t)
-      }
-      return p
-    },*/
     container_style () {
       return {
         height: `${this.block_height}px`,
@@ -274,6 +235,7 @@ export default {
     },
     ...mapGetters([
       'imagesURL',
+      'imagesAllURL',
     ])
   },
   watch: {
@@ -287,7 +249,6 @@ export default {
   },
   mounted () {
     window.addEventListener("scroll", this.checkScrollPosition)
-    //let imageData = fetch(this.source).then(res => res.json())
     this.getImages()
   },
   destroyed () {
@@ -326,7 +287,6 @@ export default {
   border: 3px solid var(--color-main);
   padding: 5px 10px;
   height: auto;
-  margin-right: 5px;
 }
 .vue-button:hover {
   cursor: pointer;
