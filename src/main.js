@@ -27,6 +27,9 @@ const store = new Vuex.Store({
     imagesURL: (state) => {
       return `${state.api}/albums/`
     },
+    imagesAllURL: (state) => {
+      return `${state.api}/images/all/`
+    }
   },
 })
 
