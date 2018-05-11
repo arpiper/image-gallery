@@ -14,7 +14,11 @@
         <h4>{{ album.name }}</h4>
         <img :src="album.img.url" :alt="album.img.name" class="album-img">
       </router-link>
+    
     </div>
+    <router-link :to="{name: 'one_album', params: { name: 'all' }}">
+      <h4>All Images</h4>
+    </router-link>
   </div>
 </template>
 
