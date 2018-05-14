@@ -64,6 +64,7 @@ export default {
       fetch(this.source).then(res => {
         return res.json()
       }).then((res) =>  {
+        this.title = res.album.name
         this.displayImages(res.images)
       })
     },
