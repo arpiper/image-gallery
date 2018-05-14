@@ -1,24 +1,24 @@
 <template>
   <div class="album-block">
-    <!--div v-for="album in albums" v-if="album.img" class="albums" >
-      <div v-on:click="selectAlbum(album)" class="album">
-        <h4>{{ album.name }}</h4>
-        <img :src="album.img.url" :alt="album.img.name" class="album-img">
-      </div>
-    </div>
-    <div class="message" v-else-if="statuscode !== 200">
+    <div class="message" v-if="statuscode !== 200">
       <span>{{ message }}</span>
-    </div-->
+    </div>
     <div v-for="album of albums" class="albums">
       <router-link :to="{name: 'one_album', params: { name: album.clean_name }}">
         <h4>{{ album.name }}</h4>
         <img :src="album.img.url" :alt="album.img.name" class="album-img">
       </router-link>
-    
     </div>
-    <router-link :to="{name: 'one_album', params: { name: 'all' }}">
-      <h4>All Images</h4>
-    </router-link>
+    <div>
+      <router-link :to="{name: 'one_album', params: { name: 'all' }}">
+        <h4>All Images</h4>
+      </router-link>
+    </div>
+    <transition name="fade">
+      <div v-show="loading" class="loader-container">
+        <span class="loader"></span>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -28,15 +28,16 @@ import { mapGetters } from 'vuex'
 export default {
   name: "albums-block",
   props: {
-    name: String,
-    album_list: [Object, String],
-    album_source: String,
+    //name: String,
+    //album_list: [Object, String],
+    //album_source: String,
   },
   data () {
     return {
       albums: undefined,
       message: undefined,
       statuscode: undefined,
+      loading: true,
     }
   },
   computed: {
@@ -55,10 +56,11 @@ export default {
         })
         .then((res) => {
           this.message = res.status.message
-          this.message = res.status.code
+          this.statuscode = res.status.code
           if (res.status.code === 200) {
             this.albums = res.albums
           }
+          this.loading = false
         })
     },
   },
@@ -110,5 +112,33 @@ span {
 .last img {
   min-width: 0;
   width: auto;
+}
+.loader {
+  display: flex;
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid var(--color-main);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s ease-in-out infinite;
+}
+.loader-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: var(--color-dark-75);
+}
+.fade-enter-active,
+.fade-leave-active {
+  transition: all 0.5s;
+}
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
