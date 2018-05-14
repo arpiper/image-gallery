@@ -28,9 +28,6 @@ import { mapGetters } from 'vuex'
 export default {
   name: "albums-block",
   props: {
-    //name: String,
-    //album_list: [Object, String],
-    //album_source: String,
   },
   data () {
     return {
@@ -46,9 +43,6 @@ export default {
     ]),
   },
   methods: {
-    selectAlbum (album) {
-      this.evtHub.$emit("selectAlbum", album)
-    },
     getAlbums () {
       fetch(this.albumsURL)
         .then((res) => {

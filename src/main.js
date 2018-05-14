@@ -36,7 +36,7 @@ const store = new Vuex.Store({
 Vue.use(VueRouter)
 const router = new VueRouter({
   mode: 'history',
-  routes
+  routes,
 })
 
 new Vue({
