@@ -1,6 +1,6 @@
 <template>
   <div class="images-block-root">
-    <div v-show="!loading" class="images-block" v-bind:style="style_object">
+    <div v-show="!loading" class="images-block" :style="style_object">
       <div class="images-header">
         <h3>{{ title }}</h3>
         <span @click="goBack" class="vue-button">Back</span>
@@ -227,6 +227,10 @@ export default {
       }
     },
     style_object () {
+      if (window.innerWidth <= 768) {
+        this.margin.left = 10
+        this.margin.right = 10
+      }
       return {
         marginLeft: `${this.margin.left}px`,
         marginRight: `${this.margin.right}px`,
