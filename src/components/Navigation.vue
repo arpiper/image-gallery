@@ -7,6 +7,11 @@
       <li>
         <router-link :to="{name: 'all_albums'}">Albums</router-link>
       </li>
+      <li>
+        <router-link :to="{name: 'one_album', params: { name: 'all' }}">
+          All Images
+        </router-link>
+      </li>
     </ul>
   </div>
 </template>
@@ -37,6 +42,7 @@ export default {
 }
 .navigation ul {
   height: 100%;
+  width: 100%;
   margin: 0;
   padding: 0;
   margin-left: 100px;
@@ -54,5 +60,11 @@ export default {
 }
 .navigation a:hover {
   background-color: var(--color-main-75);
+}
+@media screen and (max-width: 768px) {
+  .navigation ul {
+    margin-left: 0;
+    padding-left: 0 10px;
+  }
 }
 </style>

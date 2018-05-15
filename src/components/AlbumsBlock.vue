@@ -9,11 +9,6 @@
         <img :src="album.img.url" :alt="album.img.name" class="album-img">
       </router-link>
     </div>
-    <div>
-      <router-link :to="{name: 'one_album', params: { name: 'all' }}">
-        <h4>All Images</h4>
-      </router-link>
-    </div>
     <transition name="fade">
       <div v-show="loading" class="loader-container">
         <span class="loader"></span>
@@ -135,6 +130,6 @@ span {
 .fade-leave-to {
   opacity: 0;
 }
-@media screen and (max-width <= 768px) {
+@media screen and (max-width: 768px) {
 }
 </style>
