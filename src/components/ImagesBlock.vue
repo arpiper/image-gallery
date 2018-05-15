@@ -2,7 +2,7 @@
   <div class="images-block-root">
     <div v-show="!loading" class="images-block" :style="style_object">
       <div class="images-header">
-        <h3>{{ title }}</h3>
+        <h3>{{ title | properCase }}</h3>
         <span @click="goBack" class="vue-button">Back</span>
       </div>
       <div class="images" v-bind:style="container_style" ref="images">
@@ -64,7 +64,9 @@ export default {
       fetch(this.source).then(res => {
         return res.json()
       }).then((res) =>  {
-        this.title = res.album.name
+        if (res.album) {
+          this.title = res.album.name
+        }
         this.displayImages(res.images)
       })
     },
@@ -203,6 +205,16 @@ export default {
     goBack () {
       this.$router.go(-1)
     },
+  },
+  filters: {
+    properCase (value) {
+      if (!value) return ''
+      let p = ''
+      value.split(' ').forEach(v => {
+        p += v.charAt(0).toUpperCase() + v.slice(1)
+      })
+      return p
+    }
   },
   computed: {
     source () {
