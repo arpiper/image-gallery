@@ -64,7 +64,7 @@ export default {
 @media screen and (max-width: 768px) {
   .navigation ul {
     margin-left: 0;
-    padding-left: 0 10px;
+    padding: 0 10px;
   }
 }
 </style>
