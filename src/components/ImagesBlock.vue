@@ -203,7 +203,7 @@ export default {
     },
     // browse back to the album list page
     goBack () {
-      this.$router.go(-1)
+      this.$router.push({name: 'all_albums'})
     },
   },
   filters: {
