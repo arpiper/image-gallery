@@ -12,9 +12,15 @@ import Navigation from './Navigation.vue'
 
 export default {
   name: 'home',
+  data () {
+    return {
+    }
+  },
   components: {
     Navigation,
-  }
+  },
+  methods: {
+  },
 }
 </script>
 

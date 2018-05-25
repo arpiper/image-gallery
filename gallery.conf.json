@@ -2,7 +2,8 @@
   "data": {
     "__commment": "type should be 'local' or 'url'",
     "type": "url",
-    "source": "https://arpiper.com/images/api",
+    "source2": "https://arpiper.com/images/api",
+    "source": "http://localhost:8080/images/api",
     "key": ""
   }
 }

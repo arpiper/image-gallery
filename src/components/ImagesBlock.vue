@@ -3,7 +3,7 @@
     <div v-show="!loading" class="images-block" :style="style_object">
       <div class="images-header">
         <h3>{{ title | properCase }}</h3>
-        <span @click="goBack" class="vue-button">Back</span>
+        <span @click="goBack" class="button">Back</span>
       </div>
       <div class="images" v-bind:style="container_style" ref="images">
         <images-single 
@@ -275,7 +275,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
 .images-block-root {
   width: 100%;
   height: 100%;

@@ -19,6 +19,7 @@ Vue.use(Vuex)
 const store = new Vuex.Store({
   state: {
     api: config.data.source,
+    token: undefined,
   },
   getters: {
     albumsURL: (state) => {
@@ -29,8 +30,19 @@ const store = new Vuex.Store({
     },
     imagesAllURL: (state) => {
       return `${state.api}/images/all/`
+    },
+    loginURL: (state) => {
+      return `${state.api}/token-auth/`
+    },
+    getToken (state) {
+      return state.token
     }
   },
+  mutations: {
+    setToken (state, token) {
+      state.token = token
+    },
+  }
 })
 
 Vue.use(VueRouter)

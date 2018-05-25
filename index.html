@@ -27,6 +27,24 @@
         margin: 0;
         background-color: rgba(0,0,0,0.1);
       }
+      .button {
+        display: inline-block;
+        background-color: var(--color-main);
+        border: 3px solid var(--color-main);
+        padding: 5px 10px;
+        height: auto;
+        font-weight: bold;
+        font-size: 14px;
+      }
+      .button:hover {
+        cursor: pointer;
+        background-color: var(--color-light);
+      }
+      .button:active, .button:focus {
+        background-color: var(--color-main);
+        opacity: 0.75;
+        outline: none;
+      }
     </style>
   </head>
   <body>
